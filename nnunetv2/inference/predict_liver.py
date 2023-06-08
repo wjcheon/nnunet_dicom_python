@@ -23,7 +23,7 @@ def main(input_path, output_path):
     predictor = nnUNetPredictor(
         tile_step_size=0.5,
         use_gaussian=True,
-        use_mirroring=True,
+        use_mirroring=False,   # Speed up for inference: factor of 4 (2D) or 8 (3D)
         perform_everything_on_gpu=True,
         device=torch.device('cuda', 0),
         verbose=False,
@@ -38,8 +38,8 @@ def main(input_path, output_path):
 
     predictor.initialize_from_trained_model_folder(
         join(nnUNet_results, 'Dataset770_LiTs2023', 'nnUNetTrainer__nnUNetPlans__3d_fullres'),
-        use_folds=(0,),
-        checkpoint_name='checkpoint_final.pth',
+        use_folds=(0,1,2,3,4),
+        checkpoint_name='checkpoint_final.pth'
     )
 
         # variant 2, use list of files as inputs. Note how we use nested lists!!!
