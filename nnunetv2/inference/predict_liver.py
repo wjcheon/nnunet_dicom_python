@@ -2,8 +2,23 @@ from nnunetv2.paths import nnUNet_results, nnUNet_raw
 import torch
 from batchgenerators.utilities.file_and_folder_operations import join
 from nnunetv2.inference.predict_from_raw_data import nnUNetPredictor
+import os
+import argparse
 
-def main():
+
+def get_parser():
+    """
+    Parse input arguments.
+    """
+    parser = argparse.ArgumentParser(description='Perform Auto-segmentation (nii2nii)')
+
+    # Positional arguments.
+    parser.add_argument("-i", help="Path to input NIFTI images")
+    parser.add_argument("-o", help="Path to output NIFTI image")
+    return parser.parse_args()
+
+
+def main(input_path, output_path):
     # instantiate the nnUNetPredictor
     predictor = nnUNetPredictor(
         tile_step_size=0.5,
@@ -27,15 +42,17 @@ def main():
         checkpoint_name='checkpoint_final.pth',
     )
 
-    # variant 1: give input and output folders
-    source_in = r'C:\Users\user\Desktop\in_liver'
-    source_out =r'C:\Users\user\Desktop\out_liver'
-    predictor.predict_from_files(source_in,
-                                 source_out,
-                                 save_probabilities=False, overwrite=False,
+        # variant 2, use list of files as inputs. Note how we use nested lists!!!
+    indir, input_filename = os.path.split(input_path)
+    outdir, output_filename = os.path.split(output_path)
+
+    predictor.predict_from_files([[join(indir, input_filename)]],
+                                 [join(outdir, output_filename)],
+                                 save_probabilities=False, overwrite=True,
                                  num_processes_preprocessing=2, num_processes_segmentation_export=2,
                                  folder_with_segs_from_prev_stage=None, num_parts=1, part_id=0)
 
 
 if __name__ == "__main__":
-    main()
+    p = get_parser()
+    main(p.i, p.o)

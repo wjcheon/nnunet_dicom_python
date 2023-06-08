@@ -150,13 +150,12 @@ class nnUNetPredictor(object):
         if isinstance(list_of_lists_or_source_folder, str):
             list_of_lists_or_source_folder = create_lists_from_splitted_dataset_folder(list_of_lists_or_source_folder,
                                                                                        self.dataset_json['file_ending'])
-        print(f'There are {len(list_of_lists_or_source_folder)} cases in the source folder')
+        #print(f'There are {len(list_of_lists_or_source_folder)} cases in the source folder')
         list_of_lists_or_source_folder = list_of_lists_or_source_folder[part_id::num_parts]
         caseids = [os.path.basename(i[0])[:-(len(self.dataset_json['file_ending']) + 5)] for i in
                    list_of_lists_or_source_folder]
-        print(
-            f'I am process {part_id} out of {num_parts} (max process ID is {num_parts - 1}, we start counting with 0!)')
-        print(f'There are {len(caseids)} cases that I would like to predict')
+        #print(f'I am process {part_id} out of {num_parts} (max process ID is {num_parts - 1}, we start counting with 0!)')
+        #print(f'There are {len(caseids)} cases that I would like to predict')
 
         if isinstance(output_folder_or_list_of_truncated_output_files, str):
             output_filename_truncated = [join(output_folder_or_list_of_truncated_output_files, i) for i in caseids]
@@ -192,7 +191,7 @@ class nnUNetPredictor(object):
                            part_id: int = 0):
         """
         This is nnU-Net's default function for making predictions. It works best for batch predictions
-        (predicting many images at once).
+        (---predicting many images at once).
         """
         if isinstance(output_folder_or_list_of_truncated_output_files, str):
             output_folder = output_folder_or_list_of_truncated_output_files
@@ -340,12 +339,13 @@ class nnUNetPredictor(object):
                     os.remove(delfile)
 
                 ofile = preprocessed['ofile']
+                space = "   "
                 if ofile is not None:
-                    print(f'\nPredicting {os.path.basename(ofile)}:')
+                    print(f'{space}Predicting {os.path.basename(ofile)}:')
                 else:
-                    print(f'\nPredicting image of shape {data.shape}:')
+                    print(f'{space}Predicting image of shape {data.shape}:')
 
-                print(f'perform_everything_on_gpu: {self.perform_everything_on_gpu}')
+                #print(f'perform_everything_on_gpu: {self.perform_everything_on_gpu}')
 
                 properties = preprocessed['data_properites']
 
@@ -363,7 +363,7 @@ class nnUNetPredictor(object):
                     # this needs to go into background processes
                     # export_prediction_from_logits(prediction, properties, configuration_manager, plans_manager,
                     #                               dataset_json, ofile, save_probabilities)
-                    print('sending off prediction to background worker for resampling and export')
+                    #print('sending off prediction to background worker for resampling and export')
                     r.append(
                         export_pool.starmap_async(
                             export_prediction_from_logits,
@@ -493,7 +493,7 @@ class nnUNetPredictor(object):
                 if len(self.list_of_parameters) > 1:
                     prediction /= len(self.list_of_parameters)
 
-            print('Prediction done, transferring to CPU if needed')
+            #print('Prediction done, transferring to CPU if needed')
             prediction = prediction.to('cpu')
             self.perform_everything_on_gpu = original_perform_everything_on_gpu
         return prediction
